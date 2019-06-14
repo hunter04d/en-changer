@@ -6,7 +6,7 @@ namespace EnChanger.Services.Abstractions
 {
     public interface IPasswordService
     {
-        Result<Entry> Add(Some<PasswordDto> passwordInput);
-        OptionalResult<PasswordDto> Get(Some<Guid> id);
+        Try<Entry> Add(Some<PasswordDto> passwordInput);
+        TryOption<PasswordDto> Get(Some<Guid> id);
     }
 }

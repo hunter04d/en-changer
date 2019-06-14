@@ -5,7 +5,7 @@ namespace EnChanger.Database
 {
     public class ApplicationDbContext : DbContext
     {
-        public DbSet<Entry> Entries { get; set; }
+        public DbSet<Entry> Entries { get; set; } = null!;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

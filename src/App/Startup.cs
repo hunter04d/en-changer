@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EnChanger.Database;
+using EnChanger.Infrastructure;
 using EnChanger.Services;
 using EnChanger.Services.Abstractions;
 using Microsoft.AspNetCore.Builder;
@@ -34,15 +35,22 @@ namespace EnChanger
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Console.WriteLine(_env.ContentRootPath);
             var connString = _configuration.GetConnectionString("DefaultConnection");
+
             services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(builder =>
                 builder.UseNpgsql(connString));
+
             services.AddDataProtection();
+
             services.AddSingleton<IFileProvider>(
                 new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "Static")));
+
             services.AddTransient<IPasswordService, PasswordService>();
-            services.AddControllers()
+
+            services.AddControllers(options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new Base64GuidModelBinderProvider());
+                })
                 .AddNewtonsoftJson();
         }
 
@@ -60,11 +68,7 @@ namespace EnChanger
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseAuthorization();
-
             app.UseStaticFiles();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

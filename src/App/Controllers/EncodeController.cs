@@ -1,6 +1,7 @@
-﻿using EnChanger.Services;
+﻿using System;
+using EnChanger.Helpers;
+using EnChanger.Services;
 using EnChanger.Services.Abstractions;
-using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EnChanger.Controllers
@@ -17,24 +18,22 @@ namespace EnChanger.Controllers
         }
 
         // GET api/values
+
         [HttpGet("{id}")]
-        public ActionResult<PasswordDto> Get(string id) =>
-            GuidConverter.FromBase64(id)
-                .Bind(guid => _passwordService.Get(guid))
-                .Match<ActionResult<PasswordDto>>(
-                    dto => dto,
-                    () => NotFound(),
-                    e => NotFound()
-                );
+        public ActionResult<PasswordDto> Get([FromRoute] Guid id) =>
+            _passwordService.Get(id).Match(
+                dto => dto,
+                (ActionResult<PasswordDto>) NotFound()
+            );
 
         [HttpPost]
         public IActionResult Post([FromBody] PasswordDto password) =>
-            _passwordService.Add(password).Match<IActionResult>(
+            _passwordService.Add(password).Match(
                 entry => CreatedAtAction(
                     "Get",
                     new {Id = GuidConverter.ToBase64(entry.Id)},
                     null),
-                e => BadRequest()
+                (IActionResult) BadRequest()
             );
     }
 }

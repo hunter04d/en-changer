@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
+using EnChanger.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
@@ -26,13 +27,13 @@ namespace EnChanger.Controllers
         [HttpGet("url/{id}")]
         public IActionResult Get([FromRoute] string id)
         {
-            return GuidConverter.FromBase64(id).Match<IActionResult>(
-                guid =>
+            return GuidConverter.FromBase64(id).Match(
+                _ =>
                 {
                     var filePath = _fileProvider.GetFileInfo("url.html").PhysicalPath;
-                    return new PhysicalFileResult(filePath, "text/html");
+                    return PhysicalFile(filePath, "text/html");
                 },
-                _ => NotFound()
+                _ => (IActionResult) NotFound()
             );
         }
     }
