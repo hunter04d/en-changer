@@ -1,6 +1,9 @@
 using System;
+using System.Security;
+using System.Security.Cryptography;
 using EnChanger.Database;
 using EnChanger.Database.Entities;
+using EnChanger.Infrastructure.Exceptions;
 using EnChanger.Services.Abstractions;
 using LanguageExt;
 using Microsoft.AspNetCore.DataProtection;
@@ -20,7 +23,7 @@ namespace EnChanger.Services
             _dataProtector = dataProtectionProvider.CreateProtector("Password").ToTimeLimitedDataProtector();
         }
 
-        public Try<Entry> Add(Some<PasswordDto> passwordInput)
+        public Entry Add(Some<PasswordDto> passwordInput)
         {
             var password = passwordInput.Value.Password;
             var entry = new Entry
@@ -29,12 +32,23 @@ namespace EnChanger.Services
             };
             _dbContext.Add(entry);
             _dbContext.SaveChanges();
-            return Try(entry);
+            return entry;
         }
 
-        public TryOption<PasswordDto> Get(Some<Guid> id) => TryOption(() =>
-            Optional(_dbContext.Entries.Find(id.Value))
-                .Map(entry => new PasswordDto(_dataProtector.Unprotect(entry.Password))));
+        public Either<BadRequestException, Option<PasswordDto>> Get(Some<Guid> id)
+        {
+            var entry = _dbContext.Entries.Find(id.Value);
+            if (entry == null)
+                return Right(Option<PasswordDto>.None);
+            try
+            {
+                return Right(Some(new PasswordDto(_dataProtector.Unprotect(entry.Password))));
+            }
+            catch (SecurityException e)
+            {
+                return Left(new BadRequestException(e));
+            }
+        }
     }
 
     public class PasswordDto

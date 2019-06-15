@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Mime;
 using EnChanger.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Net.Http.Headers;
 
 namespace EnChanger.Controllers
 {

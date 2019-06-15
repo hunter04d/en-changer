@@ -1,5 +1,6 @@
 ﻿using System;
 using EnChanger.Helpers;
+using EnChanger.Infrastructure.Filters;
 using EnChanger.Services;
 using EnChanger.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ namespace EnChanger.Controllers
 {
     [Route("api")]
     [ApiController]
+    [MonadicResultFilter]
     public class EncodeController : ControllerBase
     {
         private readonly IPasswordService _passwordService;
@@ -17,23 +19,20 @@ namespace EnChanger.Controllers
             _passwordService = passwordService;
         }
 
-        // GET api/values
-
         [HttpGet("{id}")]
-        public ActionResult<PasswordDto> Get([FromRoute] Guid id) =>
-            _passwordService.Get(id).Match(
-                dto => dto,
-                (ActionResult<PasswordDto>) NotFound()
-            );
+        [ProducesResponseType(typeof(PasswordDto), 200)]
+        public IActionResult Get([FromRoute] Guid id) =>
+            Ok(_passwordService.Get(id));
 
         [HttpPost]
-        public IActionResult Post([FromBody] PasswordDto password) =>
-            _passwordService.Add(password).Match(
-                entry => CreatedAtAction(
-                    "Get",
-                    new {Id = GuidConverter.ToBase64(entry.Id)},
-                    null),
-                (IActionResult) BadRequest()
+        public IActionResult Post([FromBody] PasswordDto password)
+        {
+            var entry = _passwordService.Add(password);
+            return CreatedAtAction(
+                "Get",
+                new {Id = GuidConverter.ToBase64(entry.Id)},
+                null
             );
+        }
     }
 }
