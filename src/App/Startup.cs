@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EnChanger.Database;
+using EnChanger.Database.Abstractions;
 using EnChanger.Infrastructure;
 using EnChanger.Services;
 using EnChanger.Services.Abstractions;
@@ -37,8 +38,10 @@ namespace EnChanger
         {
             var connString = _configuration.GetConnectionString("DefaultConnection");
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(builder =>
-                builder.UseNpgsql(connString));
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<IApplicationDbContext, ApplicationDbContext>(builder =>
+                    builder.UseNpgsql(connString)
+                );
 
             services.AddDataProtection();
 

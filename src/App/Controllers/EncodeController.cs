@@ -30,7 +30,7 @@ namespace EnChanger.Controllers
             var entry = _passwordService.Add(password);
             return CreatedAtAction(
                 "Get",
-                new {Id = GuidConverter.ToBase64(entry.Id)},
+                new {Id = entry.Id.ToBase64()},
                 null
             );
         }

@@ -7,8 +7,9 @@ namespace EnChanger.Infrastructure.Exceptions
 {
     public class BadRequestException : Exception
     {
-        public BadRequestException(Exception e) : this(e.Message)
+        public static BadRequestException From(Exception e)
         {
+            return new BadRequestException(e.Message);
         }
 
         public BadRequestException(string error) : base($"bad request: {error}")

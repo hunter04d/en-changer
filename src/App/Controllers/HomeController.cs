@@ -1,3 +1,4 @@
+using System;
 using EnChanger.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
@@ -21,16 +22,13 @@ namespace EnChanger.Controllers
         }
 
         [HttpGet("url/{id}")]
-        public IActionResult Get([FromRoute] string id)
+        // ReSharper disable once UnusedParameter.Global
+        public IActionResult Get([FromRoute] Guid id)
         {
-            return GuidConverter.FromBase64(id).Match(
-                _ =>
-                {
-                    var filePath = _fileProvider.GetFileInfo("url.html").PhysicalPath;
-                    return PhysicalFile(filePath, "text/html");
-                },
-                _ => (IActionResult) NotFound()
-            );
+            if (!ModelState.IsValid)
+                return NotFound();
+            var filePath = _fileProvider.GetFileInfo("url.html").PhysicalPath;
+            return PhysicalFile(filePath, "text/html");
         }
     }
 }

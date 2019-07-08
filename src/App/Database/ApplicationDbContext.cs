@@ -1,9 +1,10 @@
+using EnChanger.Database.Abstractions;
 using EnChanger.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EnChanger.Database
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         public DbSet<Entry> Entries { get; set; } = null!;
 
