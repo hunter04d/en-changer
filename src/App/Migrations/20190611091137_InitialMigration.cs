@@ -15,10 +15,7 @@ namespace EnChanger.Migrations
                     Password = table.Column<string>(nullable: false),
                     ExpiresOn = table.Column<DateTime>(nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Entries", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Entries", x => x.Id); });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

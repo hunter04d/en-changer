@@ -13,7 +13,7 @@ namespace EnChanger.Helpers
                 .Replace('+', '-')
                 .Replace('/', '_');
 
-        public static Either<FormatException, Guid> FromBase64(Some<string> base64Opt)
+        public static Either<FormatException, Guid> FromBase64(this Some<string> base64Opt)
         {
             var base64 = base64Opt.Value.ToCharArray();
             if (base64.Length != 22)
@@ -34,6 +34,7 @@ namespace EnChanger.Helpers
                     base64[i] = '/';
                 }
             }
+
             return Try(() =>
             {
                 var bytes = Convert.FromBase64String(string.Concat(base64.AsSpan(), "=="));

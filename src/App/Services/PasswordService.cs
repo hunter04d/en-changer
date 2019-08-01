@@ -16,12 +16,14 @@ namespace EnChanger.Services
     {
         private readonly IApplicationDbContext _dbContext;
 
-        private readonly ITimeLimitedDataProtector _dataProtector;
+        private readonly IDataProtector _dataProtector;
+
+        internal static readonly string ProtectorPurpose = typeof(PasswordService).AssemblyQualifiedName;
 
         public PasswordService(IApplicationDbContext dbContext, IDataProtectionProvider dataProtectionProvider)
         {
             _dbContext = dbContext;
-            _dataProtector = dataProtectionProvider.CreateProtector("Password").ToTimeLimitedDataProtector();
+            _dataProtector = dataProtectionProvider.CreateProtector(ProtectorPurpose);
         }
 
         public Entry Add(Some<PasswordDto> passwordInput)
@@ -29,7 +31,7 @@ namespace EnChanger.Services
             var password = passwordInput.Value.Password;
             var entry = new Entry
             {
-                Password = _dataProtector.Protect(password, TimeSpan.FromMinutes(5))
+                Password = _dataProtector.Protect(password)
             };
             _dbContext.Entries.Add(entry);
             _dbContext.SaveChanges();
@@ -50,11 +52,8 @@ namespace EnChanger.Services
 
     public class PasswordDto
     {
-        public PasswordDto(string password)
-        {
-            Password = password;
-        }
+        public string Password { get; }
 
-        public string Password { get; set; }
+        public PasswordDto(string password) => Password = password;
     }
 }
