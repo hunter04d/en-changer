@@ -46,7 +46,7 @@ namespace EnChanger
             services.AddDataProtection();
 
             services.AddSingleton<IFileProvider>(
-                new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "Static")));
+                new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "vue/dist")));
 
             services.AddTransient<IPasswordService, PasswordService>();
 
@@ -72,7 +72,12 @@ namespace EnChanger
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "vue/dist")),
+                RequestPath = "/static",
+
+            });
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }

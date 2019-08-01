@@ -11,8 +11,5 @@ indent_style = space
 indent_size = 4
 charset = utf-8
 
-[*.{js, html}]
-indent_size = 2
-
-[*.json]
+[*.{js, html, json, vue}]
 indent_size = 2
