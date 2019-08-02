@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using EnChanger.Database;
 using EnChanger.Database.Entities;
@@ -30,10 +31,10 @@ namespace App.Tests.Services
         }
 
         [Fact]
-        public void AddingEntryTest()
+        public void AddingEntry_Test()
         {
             var sut = new PasswordService(_dbContext, _dataProtectionProvider);
-            var entry = sut.Add(new PasswordDto(Password));
+            var entry = sut.Add(new PasswordInput(Password, 1));
 
             entry.Id.Should().NotBeEmpty();
 
@@ -41,19 +42,45 @@ namespace App.Tests.Services
         }
 
         [Fact]
-        public void GettingEntryTest()
+        public void GettingSingleUseEntryTest()
         {
             var sut = new PasswordService(_dbContext, _dataProtectionProvider);
             var entry = new Entry
             {
-                Password = _dataProtector.Protect(Password)
+                Password = _dataProtector.Protect(Password),
+                NumberOfAccesses = 1
             };
             _dbContext.Entries.Add(entry);
 
-            var result = sut.Get(entry.Id);
-            var value = result.ValueUnsafe().ValueUnsafe();
-            value.Should().NotBeNull();
-            value.Password.Should().Be(Password);
+            var result = sut.Get(entry.Id).ValueUnsafe().ValueUnsafe();
+
+            result.Should().NotBeNull();
+            result.Password.Should().Be(Password);
+            _dbContext.Entries.AsEnumerable().Should().NotContain(entry);
+        }
+
+        [Theory]
+        [InlineData(2)]
+        [InlineData(20)]
+        public void GettingEntriesMultipleTimesTest(uint numberOfAccesses)
+        {
+            var sut = new PasswordService(_dbContext, _dataProtectionProvider);
+            var entry = new Entry
+            {
+                Password = _dataProtector.Protect(Password),
+                NumberOfAccesses = numberOfAccesses
+            };
+            _dbContext.Entries.Add(entry);
+            for (uint i = 0; i < numberOfAccesses; i++)
+            {
+                var result = sut.Get(entry.Id).ValueUnsafe().ValueUnsafe();
+                result.Should().NotBeNull();
+                result.Password.Should().Be(Password);
+            }
+
+            //_dbContext.SaveChanges();
+            var entries = _dbContext.Entries.AsEnumerable();
+            entries.Should().NotContain(entry);
         }
 
         public void Dispose()

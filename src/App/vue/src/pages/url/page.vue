@@ -1,6 +1,6 @@
 <template>
   <div id="page" class="md-layout md-alignment-center-space-around md-gutter">
-    <div class="md-layout-item md-small-hide"> </div>
+    <div class="md-layout-item md-small-hide"></div>
     <div class="md-layout-item">
       <md-card md-with-hover>
         <md-card-header>

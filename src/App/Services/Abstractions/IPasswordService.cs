@@ -7,7 +7,7 @@ namespace EnChanger.Services.Abstractions
 {
     public interface IPasswordService
     {
-        Entry Add(Some<PasswordDto> passwordInput);
-        Either<BadRequestException, Option<PasswordDto>> Get(Some<Guid> id);
+        Entry Add(PasswordInput passwordInput);
+        Either<BadRequestException, Option<PasswordDto>> Get(Guid id);
     }
 }

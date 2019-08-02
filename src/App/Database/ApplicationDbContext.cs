@@ -17,6 +17,7 @@ namespace EnChanger.Database
             modelBuilder.Entity<Entry>().HasKey(entry => entry.Id);
             modelBuilder.Entity<Entry>().Property(entry => entry.Id).ValueGeneratedOnAdd();
             modelBuilder.Entity<Entry>().Property(entry => entry.Password).IsRequired();
+            modelBuilder.Entity<Entry>().Property(entry => entry.NumberOfAccesses).IsConcurrencyToken().HasDefaultValue();
         }
     }
 }

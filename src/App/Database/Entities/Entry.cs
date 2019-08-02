@@ -7,5 +7,7 @@ namespace EnChanger.Database.Entities
         public Guid Id { get; set; }
 
         public string Password { get; set; } = null!;
+
+        public uint NumberOfAccesses { get; set; }
     }
 }

@@ -25,7 +25,7 @@ namespace EnChanger.Controllers
             Ok(_passwordService.Get(id));
 
         [HttpPost]
-        public IActionResult Post([FromBody] PasswordDto password)
+        public IActionResult Post([FromBody] PasswordInput password)
         {
             var entry = _passwordService.Add(password);
             return CreatedAtAction(

@@ -13,11 +13,22 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview7.19362.6" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview7" />
     </ItemGroup>
-
     <ItemGroup>
-      <Content Include="Static\index.html">
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
+        <Content Remove="vue\**" />
+        <None Remove="vue\**" />
+        <None Include="vue\**" Exclude="vue\node_modules\**" />
     </ItemGroup>
 
+    <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+        <Exec WorkingDirectory="vue\" Command="npm install" />
+        <Exec WorkingDirectory="vue\" Command="npm run build" />
+        <ItemGroup>
+            <DistFiles Include="vue\dist\**" />
+            <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+                <RelativePath>%(DistFiles.Identity)</RelativePath>
+                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
+    
 </Project>
