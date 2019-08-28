@@ -18,6 +18,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
+using Serilog;
 
 namespace EnChanger
 {
@@ -40,7 +43,7 @@ namespace EnChanger
 
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<IApplicationDbContext, ApplicationDbContext>(builder =>
-                    builder.UseNpgsql(connString)
+                    builder.UseNpgsql(connString, options => options.UseNodaTime())
                 );
 
             services.AddDataProtection();
@@ -49,12 +52,14 @@ namespace EnChanger
                 new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "vue/dist")));
 
             services.AddTransient<IPasswordService, PasswordService>();
+            services.AddSingleton<IClock>(SystemClock.Instance);
 
             services.AddControllers(options =>
                 {
                     options.ModelBinderProviders.Insert(0, new Base64GuidModelBinderProvider());
                 })
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(settings =>
+                    settings.SerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,14 +74,13 @@ namespace EnChanger
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
+            app.UseSerilogRequestLogging();
             app.UseRouting();
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "vue/dist")),
                 RequestPath = "/static",
-
             });
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

@@ -1,13 +1,35 @@
 using System;
+using NodaTime;
 
 namespace EnChanger.Database.Entities
 {
     public class Entry
     {
-        public Guid Id { get; set; }
+        public Entry(Guid id, string password, uint? numberOfAccesses, Instant? validUntil, Instant createdAt)
+        {
+            Id = id;
+            Password = password;
+            NumberOfAccesses = numberOfAccesses;
+            ValidUntil = validUntil;
+            CreatedAt = createdAt;
+        }
 
-        public string Password { get; set; } = null!;
+        public Entry(string password, uint? numberOfAccesses, Duration? validFor, IClock clock)
+        {
+            Password = password;
+            NumberOfAccesses = numberOfAccesses;
+            CreatedAt = clock.GetCurrentInstant();
+            ValidUntil = CreatedAt + validFor;
+        }
 
-        public uint NumberOfAccesses { get; set; }
+        public Guid Id { get; }
+
+        public string Password { get; }
+
+        public uint? NumberOfAccesses { get; set; }
+
+        public Instant? ValidUntil { get; }
+
+        public Instant CreatedAt { get; }
     }
 }

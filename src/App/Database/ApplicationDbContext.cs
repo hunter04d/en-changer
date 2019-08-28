@@ -1,6 +1,8 @@
+using System;
 using EnChanger.Database.Abstractions;
 using EnChanger.Database.Entities;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace EnChanger.Database
 {
@@ -14,10 +16,15 @@ namespace EnChanger.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Entry>().HasKey(entry => entry.Id);
-            modelBuilder.Entity<Entry>().Property(entry => entry.Id).ValueGeneratedOnAdd();
-            modelBuilder.Entity<Entry>().Property(entry => entry.Password).IsRequired();
-            modelBuilder.Entity<Entry>().Property(entry => entry.NumberOfAccesses).IsConcurrencyToken().HasDefaultValue();
+            modelBuilder.Entity<Entry>(b =>
+            {
+                b.HasKey(e => e.Id);
+                b.Property(e=> e.Id).ValueGeneratedOnAdd();
+                b.Property(e=> e.Password).IsRequired();
+                b.Property(e=> e.NumberOfAccesses).IsConcurrencyToken();
+                b.Property(e => e.ValidUntil);
+                b.Property(e=> e.CreatedAt);
+            });
         }
     }
 }

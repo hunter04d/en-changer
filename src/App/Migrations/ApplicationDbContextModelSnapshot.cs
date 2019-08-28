@@ -4,6 +4,7 @@ using EnChanger.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace EnChanger.Migrations
@@ -15,20 +16,29 @@ namespace EnChanger.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "3.0.0-preview7.19362.6")
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                .HasAnnotation("ProductVersion", "3.0.0-preview8.19405.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("EnChanger.Database.Entities.Entry", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                    b.Property<long>("NumberOfAccesses")
-                        .IsConcurrencyToken();
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp");
+
+                    b.Property<long?>("NumberOfAccesses")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Password")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Instant?>("ValidUntil")
+                        .HasColumnType("timestamp");
 
                     b.HasKey("Id");
 

@@ -17,15 +17,12 @@ namespace EnChanger.Infrastructure.Filters
             if (context.Result is ObjectResult objectResult)
             {
                 var value = objectResult.Value;
-                switch (value)
+                context.Result = value switch
                 {
-                    case IEither either:
-                        context.Result = MatchEither(either);
-                        break;
-                    case IOptional optional:
-                        context.Result = MatchOptional(optional);
-                        break;
-                }
+                    IEither either => MatchEither(either),
+                    IOptional optional => MatchOptional(optional),
+                    _ => context.Result
+                };
             }
         }
 

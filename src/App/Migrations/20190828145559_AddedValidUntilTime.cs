@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NodaTime;
 
 namespace EnChanger.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class AddedValidUntilTime : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,9 +14,14 @@ namespace EnChanger.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Password = table.Column<string>(nullable: false),
-                    ExpiresOn = table.Column<DateTime>(nullable: false)
+                    NumberOfAccesses = table.Column<long>(nullable: true),
+                    ValidUntil = table.Column<Instant>(nullable: true),
+                    CreatedAt = table.Column<Instant>(nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("PK_Entries", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Entries", x => x.Id);
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

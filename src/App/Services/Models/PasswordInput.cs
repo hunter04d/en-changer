@@ -1,0 +1,19 @@
+using NodaTime;
+
+namespace EnChanger.Services.Models
+{
+    public class PasswordInput
+    {
+        public string Password { get; }
+        public uint? NumberOfAccesses { get; }
+
+        public Duration? Duration { get; }
+
+        public PasswordInput(string password, uint? numberOfAccesses, Duration? duration = null)
+        {
+            Password = password;
+            NumberOfAccesses = numberOfAccesses;
+            Duration = duration;
+        }
+    }
+}
