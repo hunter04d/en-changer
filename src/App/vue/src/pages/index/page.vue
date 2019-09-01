@@ -1,35 +1,34 @@
 <template>
-  <div id="page">
-    <h1 class="md-display-3">EnChanger</h1>
-    <div class="md-layout md-alignment-center-center">
-      <div class="md-layout-item md-size-15 md-small-hide"></div>
-      <div class="md-layout-item">
-        <md-field>
-          <md-icon>mode_edit</md-icon>
-          <label>Password</label>
-          <md-input v-model="password"></md-input>
-        </md-field>
-      </div>
-      <div class="md-layout-item md-size-15 md-small-hide"></div>
-    </div>
-    <md-button
-      :disabled="buttonDisabled"
-      class="centre md-primary md-raised "
-      v-on:click="onClick"
-    >
-      Encode
-    </md-button>
-    <div v-if="url" class="md-layout">
-      <div class="md-layout-item md-size-15 md-small-hide"></div>
-      <md-list class="md-elevation-1 md-layout-item">
-        <md-list-item>
-          <md-icon>link</md-icon>
-          <a :href="url" class="md-list-item-text">{{ url }} </a>
-        </md-list-item>
-      </md-list>
-      <div class="md-layout-item md-size-15 md-small-hide"></div>
-    </div>
-  </div>
+  <v-app id="page">
+    <v-content>
+      <v-container fluid>
+        <h1 class="display-1 text-center">EnChanger</h1>
+
+        <v-row>
+          <v-col class="offset-md-2" md="8">
+            <v-text-field
+              v-model="password"
+              label="Information"
+              prepend-icon="mdi-pencil"
+              outlined
+            />
+            <v-btn
+              block
+              rounded
+              x-large
+              :disabled="buttonDisabled"
+              @click="onClick"
+            >
+              Encode
+            </v-btn>
+            <v-banner v-if="url" class="mt-2" elevation="2" single-line>
+              <a :href="url">{{ url }} </a>
+            </v-banner>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
+  </v-app>
 </template>
 
 <script>
@@ -71,14 +70,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-#page > h1 {
-  text-align: center;
-}
-
-.centre {
-  display: block !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-</style>
+<style lang="scss"></style>
