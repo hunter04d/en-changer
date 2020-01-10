@@ -24,7 +24,7 @@ namespace EnChanger.Services
 
         private readonly IClock _clock;
 
-        internal static readonly string ProtectorPurpose = typeof(PasswordService).AssemblyQualifiedName;
+        internal static readonly string ProtectorPurpose = typeof(PasswordService).AssemblyQualifiedName!;
 
         public PasswordService(
             IApplicationDbContext dbContext,

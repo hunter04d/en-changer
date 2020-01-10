@@ -23,16 +23,12 @@ namespace EnChanger.Helpers
 
             for (var i = base64.Length - 1; i >= 0; i--)
             {
-                var @char = base64[i];
-                if (@char == '-')
+                base64[i] = base64[i] switch
                 {
-                    base64[i] = '+';
-                }
-
-                if (@char == '_')
-                {
-                    base64[i] = '/';
-                }
+                    '-' => '+',
+                    '_' => '/',
+                    _ => base64[i]
+                };
             }
 
             return Try(() =>

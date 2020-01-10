@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using EnChanger.Database;
 using EnChanger.Database.Abstractions;
 using EnChanger.Infrastructure;
@@ -10,14 +6,11 @@ using EnChanger.Services;
 using EnChanger.Services.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using Serilog;
@@ -40,7 +33,7 @@ namespace EnChanger
         public void ConfigureServices(IServiceCollection services)
         {
             var connString = _configuration.GetConnectionString("DefaultConnection");
-
+            var clientAppDir = _configuration.GetValue<string>("ClientAppDir");
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<IApplicationDbContext, ApplicationDbContext>(builder =>
                     builder.UseNpgsql(connString, options => options.UseNodaTime())
@@ -49,7 +42,7 @@ namespace EnChanger
             services.AddDataProtection();
 
             services.AddSingleton<IFileProvider>(
-                new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "vue/dist")));
+                new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, clientAppDir)));
 
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddSingleton<IClock>(SystemClock.Instance);
@@ -77,9 +70,10 @@ namespace EnChanger
             app.UseHttpsRedirection();
             app.UseSerilogRequestLogging();
             app.UseRouting();
+            var clientAppDir = _configuration.GetValue<string>("ClientAppDir");
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, "vue/dist")),
+                FileProvider = new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, clientAppDir)),
                 RequestPath = "/static",
             });
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

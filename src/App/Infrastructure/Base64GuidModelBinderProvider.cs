@@ -5,7 +5,7 @@ namespace EnChanger.Infrastructure
 {
     public class Base64GuidModelBinderProvider : IModelBinderProvider
     {
-        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        public IModelBinder? GetBinder(ModelBinderProviderContext context)
         {
             if (context == null)
             {

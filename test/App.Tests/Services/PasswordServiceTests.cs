@@ -1,13 +1,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using EnChanger.Database;
 using EnChanger.Database.Entities;
 using EnChanger.Services;
 using EnChanger.Services.Models;
 using FluentAssertions;
-using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +13,7 @@ using NodaTime;
 using NodaTime.Testing;
 using Xunit;
 
-namespace App.Tests.Services
+namespace EnChanger.Tests.Services
 {
     [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
     public class PasswordServiceTests : IDisposable
@@ -65,6 +63,7 @@ namespace App.Tests.Services
         [Theory]
         [InlineData(2)]
         [InlineData(20)]
+        [InlineData(100)]
         public void GettingEntriesMultipleTimes_ShouldWork(uint numberOfAccesses)
         {
             var entry = new Entry(_dataProtector.Protect(Password), numberOfAccesses, null, _clock);

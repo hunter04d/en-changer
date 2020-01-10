@@ -29,6 +29,7 @@ namespace EnChanger.Controllers
                 return NotFound();
             var filePath = _fileProvider.GetFileInfo("url.html").PhysicalPath;
             return PhysicalFile(filePath, "text/html");
+
         }
     }
 }
