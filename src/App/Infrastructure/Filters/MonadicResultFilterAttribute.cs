@@ -14,16 +14,15 @@ namespace EnChanger.Infrastructure.Filters
 
         public void OnResultExecuting(ResultExecutingContext context)
         {
-            if (context.Result is ObjectResult objectResult)
+            if (!(context.Result is ObjectResult objectResult)) return;
+
+            var value = objectResult.Value;
+            context.Result = value switch
             {
-                var value = objectResult.Value;
-                context.Result = value switch
-                {
-                    IEither either => MatchEither(either),
-                    IOptional optional => MatchOptional(optional),
-                    _ => context.Result
-                };
-            }
+                IEither either => MatchEither(either),
+                IOptional optional => MatchOptional(optional),
+                _ => context.Result
+            };
         }
 
         private static IActionResult MatchOptional(IOptional optional) =>
@@ -40,8 +39,7 @@ namespace EnChanger.Infrastructure.Filters
                 l => l is Exception e
                     ? MatchException(e)
                     : throw new InvalidOperationException(
-                        $"{l.GetType().FullName} cannot be used as a left of an Either<> returned from controller")
-            );
+                        $"{l.GetType().FullName} cannot be used as a left of an Either<L, R> returned from controller"));
 
         // TODO: match depending on the type of the exception
         private static IActionResult MatchException(Exception exception) => exception.Match<IActionResult>()

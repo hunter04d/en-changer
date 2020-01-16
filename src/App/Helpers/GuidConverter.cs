@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+using System.Text;
 using EnChanger.Extensions;
 using LanguageExt;
+using Microsoft.AspNetCore.WebUtilities;
 using static LanguageExt.Prelude;
 
 namespace EnChanger.Helpers
@@ -8,32 +11,22 @@ namespace EnChanger.Helpers
     public static class GuidConverter
     {
         public static string ToBase64(this Guid guid) =>
-            Convert.ToBase64String(guid.ToByteArray())
-                .Substring(0, 22)
-                .Replace('+', '-')
-                .Replace('/', '_');
+            WebEncoders.Base64UrlEncode(guid.ToByteArray());
 
-        public static Either<FormatException, Guid> FromBase64(this Some<string> base64Opt)
+        public static Either<FormatException, Guid> FromBase64(this string base64)
         {
-            var base64 = base64Opt.Value.ToCharArray();
+
+            if (string.IsNullOrEmpty(base64))
+            {
+                throw new ArgumentException($"{nameof(base64)} is null or empty");
+            }
             if (base64.Length != 22)
             {
                 return Left(new FormatException("Input string was not in a correct format."));
             }
-
-            for (var i = base64.Length - 1; i >= 0; i--)
-            {
-                base64[i] = base64[i] switch
-                {
-                    '-' => '+',
-                    '_' => '/',
-                    _ => base64[i]
-                };
-            }
-
             return Try(() =>
             {
-                var bytes = Convert.FromBase64String(string.Concat(base64.AsSpan(), "=="));
+                var bytes = WebEncoders.Base64UrlDecode(base64);
                 return new Guid(bytes);
             }).ToEither(e => e.CatchAs<FormatException>());
         }

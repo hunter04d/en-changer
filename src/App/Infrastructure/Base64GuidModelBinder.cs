@@ -29,7 +29,7 @@ namespace EnChanger.Infrastructure
                 return Task.CompletedTask;
             }
 
-            GuidConverter.FromBase64(value).Match(
+            value.FromBase64().Match(
                 guid => bindingContext.Result = ModelBindingResult.Success(guid),
                 e => bindingContext.ModelState.TryAddModelError(modelName, e.Message));
             return Task.CompletedTask;
