@@ -3,7 +3,7 @@
     <v-content>
       <v-container fluid>
         <v-card max-width="100vh" ripple class="mx-auto">
-          <v-card-title>{{password}}</v-card-title>
+          <v-card-title>{{ password }}</v-card-title>
           <v-card-actions>
             <div class="flex-grow-1"></div>
             <v-btn text href="/">new link</v-btn>

@@ -40,12 +40,11 @@ namespace EnChanger.Tests.Helpers
             input.FromBase64().IsLeft.Should().BeTrue();
         }
 
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        public void FromBase64_Throws_OnInvalidInput(string input)
+        [Fact]
+        public void FromBase64_Throws_OnInvalidInput()
         {
-            input.Invoking(_ => _.FromBase64()).Should().Throw<FormatException>();
+            string? input = null;
+            Assert.Throws<ArgumentNullException>(() => input!.FromBase64());
         }
     }
 }

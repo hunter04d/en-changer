@@ -45,6 +45,8 @@ namespace EnChanger.Infrastructure.Filters
         private static IActionResult MatchException(Exception exception) => exception.Match<IActionResult>()
             .With<BadRequestException>(e =>
                 new BadRequestObjectResult(new ValidationProblemDetails(e.Errors)))
+            .With<NotFoundException>(e =>
+                new NotFoundObjectResult(e.Message))
             .OtherwiseReThrow();
     }
 }

@@ -15,10 +15,9 @@ namespace EnChanger.Helpers
 
         public static Either<FormatException, Guid> FromBase64(this string base64)
         {
-
-            if (string.IsNullOrEmpty(base64))
+            if (base64 == null)
             {
-                throw new ArgumentException($"{nameof(base64)} is null or empty");
+                throw new ArgumentNullException(nameof(base64));
             }
             if (base64.Length != 22)
             {

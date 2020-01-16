@@ -31,5 +31,8 @@ namespace EnChanger.Database.Entities
         public Instant? ValidUntil { get; }
 
         public Instant CreatedAt { get; }
+
+        public Guid? SessionId { get; set; }
+        public Session? Session { get; set; }
     }
 }

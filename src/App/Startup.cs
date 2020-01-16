@@ -34,9 +34,8 @@ namespace EnChanger
         {
             var connString = _configuration.GetConnectionString("DefaultConnection");
             var clientAppDir = _configuration.GetValue<string>("ClientAppDir");
-            services.AddEntityFrameworkNpgsql()
-                .AddDbContext<IApplicationDbContext, ApplicationDbContext>(builder =>
-                    builder.UseNpgsql(connString, options => options.UseNodaTime())
+            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
+                    options.UseNpgsql(connString, npgSql => npgSql.UseNodaTime())
                 );
 
             services.AddDataProtection();
@@ -45,6 +44,7 @@ namespace EnChanger
                 new PhysicalFileProvider(Path.Combine(_env.ContentRootPath, clientAppDir)));
 
             services.AddTransient<IPasswordService, PasswordService>();
+            services.AddTransient<ISessionService, SessionService>();
             services.AddSingleton<IClock>(SystemClock.Instance);
 
             services.AddControllers(options =>
@@ -67,6 +67,7 @@ namespace EnChanger
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseSerilogRequestLogging();
             app.UseRouting();
