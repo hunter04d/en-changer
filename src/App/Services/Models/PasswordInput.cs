@@ -12,11 +12,12 @@ namespace EnChanger.Services.Models
 
         public Guid? SessionId { get; }
 
-        public PasswordInput(string password, uint? numberOfAccesses, Duration? duration = null)
+        public PasswordInput(string password, uint? numberOfAccesses, Duration? duration = null, Guid? sessionId = null)
         {
             Password = password;
             NumberOfAccesses = numberOfAccesses;
             Duration = duration;
+            SessionId = sessionId;
         }
     }
 }

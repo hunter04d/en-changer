@@ -1,7 +1,7 @@
 using System;
 using NodaTime;
 
-namespace EnChanger.Services
+namespace EnChanger.Services.Models
 {
     public class SessionDto
     {

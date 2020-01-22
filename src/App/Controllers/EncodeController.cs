@@ -28,10 +28,10 @@ namespace EnChanger.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] PasswordInput password)
         {
-            var entry = _passwordService.Add(password);
+            var id = _passwordService.Add(password);
             return CreatedAtAction(
                 "Get",
-                new {Id = entry.Id.ToBase64()},
+                new {Id = id.ToBase64()},
                 null
             );
         }

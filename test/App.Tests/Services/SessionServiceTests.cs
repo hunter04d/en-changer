@@ -48,7 +48,7 @@ namespace EnChanger.Tests.Services
             var result = _sut.AttachToSession(entry, session.Id);
             result.IsRight.Should().BeTrue();
             entry.Session.Should().NotBeNull();
-            session.Entries.Should().NotBeEmpty();
+            _dbContext.Sessions.Find(session.Id).Entries.Should().NotBeEmpty();
         }
 
         [Fact]

@@ -6,6 +6,7 @@ using EnChanger.Database.Abstractions;
 using EnChanger.Database.Entities;
 using EnChanger.Infrastructure.Exceptions;
 using EnChanger.Services.Abstractions;
+using EnChanger.Services.Models;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
@@ -25,7 +26,7 @@ namespace EnChanger.Services
         }
 
 
-        public Session NewSession()
+        public SessionDto NewSession()
         {
             var session = new Session
             {
@@ -34,7 +35,7 @@ namespace EnChanger.Services
             };
             _dbContext.Sessions.Add(session);
             _dbContext.SaveChanges();
-            return session;
+            return new SessionDto(session.Id, session.ExpiryTime);
         }
 
         public Either<NotFoundException, Unit> AttachToSession(Entry e, Guid sessionId)
@@ -42,6 +43,13 @@ namespace EnChanger.Services
             var session = _dbContext.Sessions.Find(sessionId);
             if (session == null)
             {
+                return Left(new NotFoundException(nameof(session), sessionId));
+            }
+
+            if (SessionIsValid(session))
+            {
+                _dbContext.Sessions.Remove(session);
+                _dbContext.SaveChanges();
                 return Left(new NotFoundException(nameof(session), sessionId));
             }
 
@@ -59,7 +67,7 @@ namespace EnChanger.Services
                 return None;
             }
 
-            if (session.ExpiryTime < _clock.GetCurrentInstant())
+            if (SessionIsValid(session))
             {
                 _dbContext.Sessions.Remove(session);
                 _dbContext.SaveChanges();
@@ -69,6 +77,8 @@ namespace EnChanger.Services
             var dto = new SessionDto(session.Id, session.ExpiryTime);
             return Some(dto);
         }
+
+        private bool SessionIsValid(Session session) => session.ExpiryTime < _clock.GetCurrentInstant();
 
         public IEnumerable<Guid> GetAssociatedEntriesIds(Guid sessionId) =>
             _dbContext.Entries.AsNoTracking()

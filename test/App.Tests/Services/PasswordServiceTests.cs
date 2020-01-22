@@ -3,15 +3,22 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using EnChanger.Database;
 using EnChanger.Database.Entities;
+using EnChanger.Infrastructure.Exceptions;
 using EnChanger.Services;
+using EnChanger.Services.Abstractions;
 using EnChanger.Services.Models;
 using FluentAssertions;
+using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NodaTime;
 using NodaTime.Testing;
 using Xunit;
+using static LanguageExt.Prelude;
 
 namespace EnChanger.Tests.Services
 {
@@ -24,8 +31,10 @@ namespace EnChanger.Tests.Services
         private readonly EphemeralDataProtectionProvider _dataProtectionProvider;
         private readonly IDataProtector _dataProtector;
         private readonly FakeClock _clock;
+        private readonly Mock<ISessionService> _sessionService;
 
         private readonly PasswordService _sut;
+
 
         public PasswordServiceTests()
         {
@@ -35,21 +44,51 @@ namespace EnChanger.Tests.Services
             _dataProtectionProvider = new EphemeralDataProtectionProvider();
             _dataProtector = _dataProtectionProvider.CreateProtector(PasswordService.ProtectorPurpose);
             _clock = new FakeClock(new Instant());
-            _sut = new PasswordService(_dbContext, _dataProtectionProvider, _clock);
+            _sessionService = new Mock<ISessionService>();
+            _sut = new PasswordService(
+                _dbContext,
+                _dataProtectionProvider,
+                _clock,
+                _sessionService.Object,
+                NullLogger<PasswordService>.Instance
+            );
         }
 
         [Fact]
         public void EntryCanBeAdded()
         {
-            var entry = _sut.Add(new PasswordInput(Password, 1));
+            var id = _sut.Add(new PasswordInput(Password, 1));
 
-            entry.Id.Should().NotBeEmpty();
+
+            id.Should().NotBeEmpty();
+
+            var entry = _dbContext.Entries.Find(id);
+            entry.Should().NotBeNull();
 
             _dataProtector.Unprotect(entry.Password).Should().Be(Password);
         }
 
         [Fact]
-        public void EntryCanBeGot()
+        public void AddingEntry_ShouldReturn_WhenAttachingToSessionWasRight()
+        {
+            _sessionService.Setup(service => service.AttachToSession(It.IsAny<Entry>(), It.IsAny<Guid>()))
+                .Returns(Right(Unit.Default));
+            var entry = _sut.Add(new PasswordInput(Password, 1, null, Guid.NewGuid()));
+            entry.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void AddingEntry_ShouldReturn_WhenAttachingToSessionWasLeft()
+        {
+            _sessionService.Setup(service => service.AttachToSession(It.IsAny<Entry>(), It.IsAny<Guid>()))
+                .Returns(Left(new NotFoundException("test", "key")));
+            var entry = _sut.Add(new PasswordInput(Password, 1, null, Guid.NewGuid()));
+
+            entry.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void EntryCanBeGot_WhenNumberOfAccessesIsNull()
         {
             var entry = new Entry(_dataProtector.Protect(Password), null, null, _clock);
             _dbContext.Entries.Add(entry);
@@ -73,6 +112,7 @@ namespace EnChanger.Tests.Services
                 var result = _sut.Get(entry.Id).ValueUnsafe().ValueUnsafe();
                 result.Should().NotBeNull();
             }
+
             var entries = _dbContext.Entries.AsEnumerable();
             entries.Should().NotContain(entry);
         }
