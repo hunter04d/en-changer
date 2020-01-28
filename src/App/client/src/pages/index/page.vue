@@ -33,7 +33,7 @@
 
 <script>
 export default {
-  name: "index",
+  name: "Index",
   data() {
     return {
       password: "",
@@ -62,6 +62,7 @@ export default {
           .then(str => {
             this.disabled = false;
             this.url = str.replace("api", "url");
+
             console.log(str);
           });
       }
@@ -69,5 +70,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss"></style>

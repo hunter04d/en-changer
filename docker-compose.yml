@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  postgres-app:
+    image: 'postgres-enchanger'
+    build:
+      context: './database'
+      dockerfile: 'Dockerfile'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-12345}
+      POSTGRES_DB: App
+    volumes:
+      - postgres-enchanger:/var/lib/postgresql/data
+    ports:
+      - '5433:5432'
+    restart: unless-stopped
+
+  app:
+    image: en-changer:latest
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+    environment:
+      ConnectionStrings__DefaultConnection: 'Host=postgres-app;Port=5432;Database=App;Username=${POSTGRES_USER:-user};Password=${POSTGRES_PASSWORD:-12345}'
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: 1m
+        max-file: '1'
+    ports:
+      - '5000:80'
+    restart: always
+    depends_on:
+      - postgres-app
+
+volumes:
+  postgres-enchanger:
+    driver: local

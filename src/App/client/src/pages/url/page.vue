@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: "url",
+  name: "Url",
   data() {
     return {
       password: ""
@@ -33,4 +33,3 @@ export default {
   }
 };
 </script>
-<style scoped lang="scss"></style>

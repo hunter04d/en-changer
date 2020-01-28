@@ -24,10 +24,10 @@
     </ItemGroup>
 
     <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
-        <Exec WorkingDirectory="vue\" Command="npm install" />
-        <Exec WorkingDirectory="vue\" Command="npm run build" />
+        <Exec WorkingDirectory="client\" Command="npm install" />
+        <Exec WorkingDirectory="client\" Command="npm run build" />
         <ItemGroup>
-            <DistFiles Include="vue\dist\**" />
+            <DistFiles Include="client\dist\**" />
             <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
                 <RelativePath>%(DistFiles.Identity)</RelativePath>
                 <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
