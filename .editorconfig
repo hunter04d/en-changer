@@ -11,5 +11,5 @@ indent_style = space
 indent_size = 4
 charset = utf-8
 
-[*.{js, html, json, vue}]
+[*.{js, html, json, vue, yaml, yml}]
 indent_size = 2
